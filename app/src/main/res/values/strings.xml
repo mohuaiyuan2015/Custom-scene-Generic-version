@@ -1,0 +1,124 @@
+<resources>
+    <string name="app_name">订制场景</string>
+    <string name="device_ble_not_supported">device ble not supported</string>
+    <string name="startClientThread">连接蓝牙服务器</string>
+    <string name="addCustomDialog">增加自定义对话</string>
+
+    <string name="delete">删除</string>
+
+    <string-array name="orders">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+
+    </string-array>
+
+    <string-array name="questionArray">
+        <item>0.</item>
+        <item>1. </item>
+
+        <!--2-->
+        <item>【徐总】你好，小图！</item>
+        <item>【徐总】上次说的郭博士来看你了</item>
+        <item>【徐总】自我介绍一下吧</item>
+        <item>【徐总】你会做什么啊</item>
+
+        <!--6-->
+        <item>【徐总】你还有什么更高级的能力？</item>
+        <item>【徐总】什么服务呢</item>
+        <item>【徐总】你真棒！</item>
+
+        <item>100.</item>
+
+    </string-array>
+    <string-array name="answerArray">
+        <item> 关闭机器人聊天 </item>
+        <item>休眠机器人</item>
+
+        <!--2-->
+        <item>你好，老徐！有事吗？</item>
+        <item>郭博士，你好。我代表图巴机器人热烈欢迎您的光临。</item>
+        <item>好的。我是“高度拟人”的智能机器人，量产化人形机器人“全球第二”、国内最高、最重的人形机器人，大家可以叫我小图。</item>
+        <item>我拥有20个自由度，可以像人类一样行走、跳舞、做俯卧撑等动作；还拥有人类无穷无尽的智慧，能听懂人类语言、与人交流，讲故事、国学、百科、数值计算、天气日期查询，都难不倒我。不过这些都只是我的基本能力。</item>
+
+        <!--6-->
+        <item>小图是一个拥有爱的机器人，人类都是我的好朋友，我喜欢陪伴在人类身边，当他们可信赖的好朋友，鼓励他们，让大家的生活充满阳光。而且，我拥有极强的拓展能力，可提供个性化的定制，为自闭症康复中心、家庭、中小学、养老院等带来各种服务。</item>
+        <item>我给大家举个例子吧。因为我长得比较萌，相信星星的孩子会喜欢跟我做朋友，跟我交流的。医生、家长都可以把教育与康复训练的内容植入我的大脑，让我来引导孩子们打开心灵之窗。而且，我会把与孩子交流的内容储存起来，医生和爸爸妈妈都可以随时调取，知道孩子的内心世界，从而分析、调整、制定更适合的治疗方案。</item>
+        <item>谢谢！</item>
+        <!--100-->
+        <item> 开放机器人聊天 </item>
+
+    </string-array>
+
+    <string-array name="actionCodeArray">
+        <item></item><!--0-->
+        <item></item><!--1-->
+
+        <item></item><!--2-->
+        <item>17</item>
+        <item>83:3400#,#66:3000#,#67:3000</item>
+        <item>14:6000#,#34:8500#,#104:4400#,#49:3600</item>
+
+        <item>42:6000#,#84:5600#,#96:5000#,#50:9600</item><!--6-->
+        <item>80:3900#,#97:6000#,#42:6000#,#86:3900#,#49:3600#,#97:6000#,#98:4100</item>
+        <item>82</item>
+
+
+        <item></item><!--100  开放机器人聊天-->
+
+    </string-array>
+
+    <string-array name="kind">
+        <item>Function</item><!--0-->
+        <item>Function</item><!--1-->
+
+        <item>Function</item><!--2-->
+        <item>Action#Speech</item>
+        <item>Action#Speech</item>
+        <item>Action#Speech</item>
+
+        <item>Action#Speech</item><!--6-->
+        <item>Action#Speech</item>
+        <item>Action#Speech</item>
+
+        <item>Function</item><!--100  开放机器人聊天-->
+
+    </string-array>
+
+    <string-array name="dialogCategoryArray">
+        <item>舞蹈</item>
+        <item>基本动作</item>
+        <item>自定义对话</item>
+
+    </string-array>
+
+    <string name="title_activity_index">IndexActivity</string>
+
+    <string name="connectReminder">Please select a device first!</string>
+
+    <string name="title_activity_custom_dialog">自定义对话</string>
+    <string name="save">保存</string>
+    <string name="customDialogCategory">类型:</string>
+
+    <string name="dance_spinner_title">请选择舞蹈:</string>
+    <string name="basic_action_spinner_title">请选择动作:</string>
+    <string name="expression_spinner_title">请选择表情:</string>
+
+    <string name="basic_action_spinner_time_title">请选择动作下发时间点:</string>
+    <string name="expression_spinner_time_title">请选择表情下发时间点:</string>
+
+
+
+    <string name="addActon">增加动作</string>
+    <string name="addExpression">增加表情</string>
+
+    <string name="question">问题:</string>
+    <string name="answer">回答(机器人回答):</string>
+
+
+</resources>

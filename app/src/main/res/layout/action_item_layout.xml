@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dip"
+    >
+    <TextView
+        android:id="@+id/actionDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="10dip"
+        android:textSize="20sp"
+        android:text="hello  world"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dip"
+        android:background="#9B9B9B"
+        android:layout_below="@+id/actionDescription"
+        android:layout_marginBottom="10dip"
+        />
+
+
+</RelativeLayout>
