@@ -22,8 +22,10 @@ import com.tuubarobot.fragment.CustomBehavior;
 import com.tuubarobot.fragment.CustomDialogFragment;
 import com.tuubarobot.fragment.DanceFragment;
 
+import java.util.Map;
+
 public class CustomDialogActivity extends AppCompatActivity {
-    private static final String TAG = "CustomDialog";
+    private static final String TAG = "CustomDialogActivity";
 
     private Context mContext;
     private Spinner dialogCategorySpinner;
@@ -38,6 +40,8 @@ public class CustomDialogActivity extends AppCompatActivity {
     private CustomDialogFragment customDialogFragment;
     private CustomBehavior customBehavior;
 
+    private Map<String,String> behaviorData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +52,6 @@ public class CustomDialogActivity extends AppCompatActivity {
         initUI();
         initData();
         initListener();
-        
 
 
 
@@ -89,6 +92,16 @@ public class CustomDialogActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
                 Log.d(TAG, "dialogCategorySpinner onNothingSelected: ");
 
+            }
+        });
+        
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: ");
+                behaviorData=customBehavior.getData();
+                Log.d(TAG, "behaviorData: "+behaviorData);
+                
             }
         });
 

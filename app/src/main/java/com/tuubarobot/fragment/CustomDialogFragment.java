@@ -32,6 +32,9 @@ import com.tuubarobot.bluetoothcommunication.R;
 import com.tuubarobot.tools.CustomTools;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -224,7 +227,7 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
 
 
 
-        expressionAdapter=new CustomDialogExpressionAdapter(expressionList);
+        expressionAdapter=new CustomDialogExpressionAdapter(mContext,expressionList);
         expressionSpinner.setAdapter(expressionAdapter);
 
         expressionExecuteMomentList=new ArrayList<>();
@@ -352,7 +355,10 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
                     return;
                 }
 
+                //增加动作组 （动作和动作下发时间点）
                 addActionData();
+                //对动作组 进行排序，按动作下发时间点 升序
+                sortShowActionList();
 
                 //设置不可编辑 状态
                 setAnswerEditTextUnEdit();
@@ -409,6 +415,8 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
 
                 //TODO mohuaiyuan  在这里对于 表情下发时刻 进行修改
                 changeExpressionExecuteMoment();
+                //显示表情下发时间点
+                initExpressionExecuteMomenSpinnerData();
 
 
             }
@@ -448,7 +456,10 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
                     return;
                 }
 
+                //增加表情组 （表情和表情下发时间点）
                 addExpressionData();
+                //对表情组 进行排序，按表情下发时间点 升序
+                sortExpressionList();
 
                 //设置不可编辑 状态
                 setAnswerEditTextUnEdit();
@@ -489,7 +500,7 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
 
     private void changeActionExecuteMoment() {
         Log.d(TAG, "changeActionExecuteMoment: ");
-        if (actionExecuteMomentList==null || actionExecuteMomentList.isEmpty()){
+        if (actionExecuteMomentListData==null || actionExecuteMomentListData.isEmpty()){
             Log.d(TAG, "动作下发时间点 列表 是空的 暂时不需要考虑: ");
             return;
         }
@@ -500,20 +511,16 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
         }
 
         if (showActionList.isEmpty()){  //第一次选择动作
-
             initActionExecuteMoment();
-
         }else {
-
             initActionExecuteMoment(1);
-
         }
 
     }
 
     private void   changeExpressionExecuteMoment(){
         Log.d(TAG, "changeExpressionExecuteMoment: ");
-        if (expressionExecuteMomentList==null || expressionExecuteMomentList.isEmpty()){
+        if (expressionExecuteMomentListData==null || expressionExecuteMomentListData.isEmpty()){
             Log.d(TAG, "表情下发时间点 列表 是空的 暂时不需要考虑: ");
             return;
         }
@@ -524,11 +531,9 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
         }
 
         if (showExpressionList.isEmpty()){  //第一次选择动作
-
             initExpressionExecuteMoment();
-
         }else {
-
+            initExpressionExecuteMoment(1);
         }
 
 
@@ -631,7 +636,6 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
         Log.d(TAG, "initActionExecuteMoment: ");
         //获取当前选择的动作  动作的执行时间 单位秒
         int operationTimeSeconds=getSelectActionOperationTime();
-        Log.d(TAG, "changeActionTime: ");
         if (operationTimeSeconds>=actionExecuteMomentList.size()){ //动作执行时间比 对话的时间还长
             //取消所有的动作 下发时间点
             for(int i=0;i<actionExecuteMomentList.size();i++){
@@ -639,7 +643,7 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
 //                refreshActionExecuteMomentData();
             }
 
-            Toast.makeText(mContext,"当前选择的动作，执行的时间太长，请选择其他的动作 ！",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,"此动作执行的时间太长，请选择其他的动作 ！",Toast.LENGTH_SHORT).show();
 
         }else {
             //从动作下发时间点 列表末尾，取消下发的时间点
@@ -652,105 +656,19 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
     }
 
     /**
-     * 初始化 动作执行时间列表 ,此时  动作组 已经有数据
-     * @param type
-     */
-    private void initActionExecuteMoment(int type) {
-        Log.d(TAG, "initActionExecuteMoment:----------------------------------- ");
-
-        initActionExecuteMoment();
-        if (type<=0){
-            return;
-        }
-
-        int unableCount=0;
-        for (int i=0;i<actionExecuteMomentList.size();i++){
-            if (!actionExecuteMomentList.get(i).isAble()){
-                unableCount++;
-            }
-        }
-        //已经取消所有的动作下发时间点
-        if (unableCount==actionExecuteMomentList.size()){
-            return;
-        }
-
-        Log.d(TAG, "-----打印 actionExecuteMomentList ----------------: ");
-            for (int i=0;i<actionExecuteMomentList.size();i++){
-                ExecuteMoment executeMoment=actionExecuteMomentList.get(i);
-                Log.d(TAG, "executeMoment: "+executeMoment);
-            }
-
-        Log.d(TAG, "------------打印 actionExecuteMomentList ---打印完成 ----: ");
-
-        //获取当前选择的动作  动作的执行时间 单位秒
-        int operationTimeSeconds=getSelectActionOperationTime();
-        Log.d(TAG, "operationTimeSeconds: "+operationTimeSeconds);
-        int temp=actionExecuteMomentList.size()-operationTimeSeconds;
-        Log.d(TAG, "temp: "+temp);
-//        for (int i=0;i<temp;i++){
-            for (int moment=0;moment<showActionList.size();moment++){
-                ActionInfo info=showActionList.get(moment);
-                int operationTime=info.getOperationTime();
-                operationTime=customUtils.convertedIntoSeconds(operationTime);
-                Log.d(TAG, "operationTime: "+operationTime);
-                int toBeOperationTime=info.getToBeOperationTime();
-                Log.d(TAG, "toBeOperationTime: "+toBeOperationTime);
-
-                if (toBeOperationTime<=temp){
-                    for (int unable=0;unable<operationTime;unable++){
-                        if ((unable+toBeOperationTime)<0 || (unable+toBeOperationTime)>=actionExecuteMomentList.size()){
-                            continue;
-                        }
-                        actionExecuteMomentList.get(unable+toBeOperationTime).setAble(false);
-                        Log.d(TAG, "(unable+toBeOperationTime): "+(unable+toBeOperationTime));
-                        Log.d(TAG, "(unable+toBeOperationTime).setAble(false): ");
-//                        refreshActionExecuteMomentData();
-                    }
-                    for (int setUnable=1;setUnable<operationTimeSeconds;setUnable++){
-                        if ((toBeOperationTime-setUnable)<0 || (toBeOperationTime-setUnable)>=actionExecuteMomentList.size()){
-                            continue;
-                        }
-
-                        actionExecuteMomentList.get(toBeOperationTime-setUnable).setAble(false);
-                        Log.d(TAG, "(toBeOperationTime-setUnable): "+(toBeOperationTime-setUnable));
-                        Log.d(TAG, "(toBeOperationTime-setUnable).setAble(false): ");
-//                        refreshActionExecuteMomentData();
-                    }
-
-                }else {
-                    continue;
-                }
-
-            }
-//        }
-
-
-        Log.d(TAG, "-----打印 actionExecuteMomentList ----------------: ");
-        for (int i=0;i<actionExecuteMomentList.size();i++){
-            ExecuteMoment executeMoment=actionExecuteMomentList.get(i);
-            Log.d(TAG, "executeMoment: "+executeMoment);
-        }
-
-        Log.d(TAG, "------------打印 actionExecuteMomentList ---打印完成 ----: ");
-
-    }
-
-
-    /**
-     * 初始化 动作执行时间列表 ,此时  动作组 为空
+     * 初始化 表情执行时间列表 ,此时  表情组 为空
      */
     private void initExpressionExecuteMoment() {
         Log.d(TAG, "initExpressionExecuteMoment: ");
         //获取当前选择的表情  表情的执行时间 单位秒
         int operationTimeSeconds=getSelectExpressionOperationTime();
-        Log.d(TAG, "changeActionTime: ");
         if (operationTimeSeconds>=expressionExecuteMomentList.size()){ //表情执行时间比 对话的时间还长
             for(int i=0;i<expressionExecuteMomentList.size();i++){
                 expressionExecuteMomentList.get(i).setAble(false);
 //                refreshExpressionExecuteMomentData();
             }
 
-            Toast.makeText(mContext,"当前选择的表情，执行的时间太长，请选择其他的表情 ！",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,"此表情执行的时间太长，请选择其他的表情 ！",Toast.LENGTH_SHORT).show();
 
         }else {
             for (int i=0;i<operationTimeSeconds;i++){
@@ -760,6 +678,166 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
             }
         }
     }
+
+    /**
+     * 初始化 动作执行时间列表 ,此时  动作组 已经有数据
+     * @param type
+     */
+    private void initActionExecuteMoment(int type) {
+        Log.d(TAG, "initActionExecuteMoment:----------------------------------- ");
+
+        initActionExecuteMoment();
+
+        int unableCount = 0;
+        for (int i = 0; i < actionExecuteMomentList.size(); i++) {
+            if (!actionExecuteMomentList.get(i).isAble()) {
+                unableCount++;
+            }
+        }
+        //已经取消所有的动作下发时间点
+        if (unableCount == actionExecuteMomentList.size() ) {
+            return;
+        }
+
+        Log.d(TAG, "-----打印 actionExecuteMomentList ----------------: ");
+        for (int i = 0; i < actionExecuteMomentList.size(); i++) {
+            ExecuteMoment executeMoment = actionExecuteMomentList.get(i);
+            Log.d(TAG, "executeMoment: " + executeMoment);
+        }
+
+        Log.d(TAG, "------------打印 actionExecuteMomentList ---打印完成 ----: ");
+
+        //获取当前选择的动作  动作的执行时间 单位秒
+        int operationTimeSeconds = getSelectActionOperationTime();
+        Log.d(TAG, "operationTimeSeconds: " + operationTimeSeconds);
+        int temp = actionExecuteMomentList.size() - operationTimeSeconds;
+        Log.d(TAG, "temp: " + temp);
+
+        for (int moment = 0; moment < showActionList.size(); moment++) {
+            ActionInfo info = showActionList.get(moment);
+            int operationTime = info.getOperationTime();
+            operationTime = customUtils.convertedIntoSeconds(operationTime);
+            Log.d(TAG, "operationTime: " + operationTime);
+            int toBeOperationTime = info.getToBeOperationTime();
+            Log.d(TAG, "toBeOperationTime: " + toBeOperationTime);
+
+            if (toBeOperationTime <= temp) {
+
+                for (int unable = 0; unable < operationTime; unable++) {
+                    if ((unable + toBeOperationTime) < 0 || (unable + toBeOperationTime) >= actionExecuteMomentList.size()) {
+                        continue;
+                    }
+                    actionExecuteMomentList.get(unable + toBeOperationTime).setAble(false);
+                    Log.d(TAG, "(unable+toBeOperationTime): " + (unable + toBeOperationTime));
+                    Log.d(TAG, "(unable+toBeOperationTime).setAble(false): ");
+//                        refreshActionExecuteMomentData();
+                }
+
+                for (int setUnable = 1; setUnable < operationTimeSeconds; setUnable++) {
+                    if ((toBeOperationTime - setUnable) < 0 || (toBeOperationTime - setUnable) >= actionExecuteMomentList.size()) {
+                        continue;
+                    }
+
+                    actionExecuteMomentList.get(toBeOperationTime - setUnable).setAble(false);
+                    Log.d(TAG, "(toBeOperationTime-setUnable): " + (toBeOperationTime - setUnable));
+                    Log.d(TAG, "(toBeOperationTime-setUnable).setAble(false): ");
+//                        refreshActionExecuteMomentData();
+                }
+
+            } else {
+                continue;
+            }
+
+        }
+
+        Log.d(TAG, "-----打印 actionExecuteMomentList ----------------: ");
+        for (int i = 0; i < actionExecuteMomentList.size(); i++) {
+            ExecuteMoment executeMoment = actionExecuteMomentList.get(i);
+            Log.d(TAG, "executeMoment: " + executeMoment);
+        }
+        Log.d(TAG, "------------打印 actionExecuteMomentList ---打印完成 ----: ");
+
+    }
+
+    /**
+     * 初始化 表情执行时间列表 ,此时  表情组 已经有数据
+     * @param type
+     */
+    private void initExpressionExecuteMoment(int type) {
+        Log.d(TAG, "initExpressionExecuteMoment:----------------------------------- ");
+
+        initExpressionExecuteMoment();
+
+        int unableCount = 0;
+        for (int i = 0; i < expressionExecuteMomentList.size(); i++) {
+            if (!expressionExecuteMomentList.get(i).isAble()) {
+                unableCount++;
+            }
+        }
+        //已经取消所有的动作下发时间点
+        if (unableCount == expressionExecuteMomentList.size() ) {
+            return;
+        }
+
+        Log.d(TAG, "-----打印 expressionExecuteMomentList ----------------: ");
+        for (int i = 0; i < expressionExecuteMomentList.size(); i++) {
+            ExecuteMoment executeMoment = expressionExecuteMomentList.get(i);
+            Log.d(TAG, "executeMoment: " + executeMoment);
+        }
+        Log.d(TAG, "------------打印 expressionExecuteMomentList ---打印完成 ----: ");
+
+        //获取当前选择的动作  动作的执行时间 单位秒
+        int operationTimeSeconds = getSelectExpressionOperationTime();
+        Log.d(TAG, "operationTimeSeconds: " + operationTimeSeconds);
+        int temp = expressionExecuteMomentList.size() - operationTimeSeconds;
+        Log.d(TAG, "temp: " + temp);
+
+        for (int moment = 0; moment < showExpressionList.size(); moment++) {
+            ExpressionInfo expressionInfo  = showExpressionList.get(moment);
+            int operationTime = expressionInfo.getOperationTime();
+            operationTime = customUtils.convertedIntoSeconds(operationTime);
+            Log.d(TAG, "operationTime: " + operationTime);
+            int toBeOperationTime = expressionInfo.getToBeOperationTime();
+            Log.d(TAG, "toBeOperationTime: " + toBeOperationTime);
+
+            if (toBeOperationTime <= temp) {
+
+                for (int unable = 0; unable < operationTime; unable++) {
+                    if ((unable + toBeOperationTime) < 0 || (unable + toBeOperationTime) >= expressionExecuteMomentList.size()) {
+                        continue;
+                    }
+                    expressionExecuteMomentList.get(unable + toBeOperationTime).setAble(false);
+                    Log.d(TAG, "(unable+toBeOperationTime): " + (unable + toBeOperationTime));
+                    Log.d(TAG, "(unable+toBeOperationTime).setAble(false): ");
+//                        refreshActionExecuteMomentData();
+                }
+
+                for (int setUnable = 1; setUnable < operationTimeSeconds; setUnable++) {
+                    if ((toBeOperationTime - setUnable) < 0 || (toBeOperationTime - setUnable) >= expressionExecuteMomentList.size()) {
+                        continue;
+                    }
+                    expressionExecuteMomentList.get(toBeOperationTime - setUnable).setAble(false);
+                    Log.d(TAG, "(toBeOperationTime-setUnable): " + (toBeOperationTime - setUnable));
+                    Log.d(TAG, "(toBeOperationTime-setUnable).setAble(false): ");
+//                        refreshActionExecuteMomentData();
+                }
+
+            } else {
+                continue;
+            }
+
+        }
+
+        Log.d(TAG, "-----打印 expressionExecuteMomentList ----------------: ");
+        for (int i = 0; i < expressionExecuteMomentList.size(); i++) {
+            ExecuteMoment executeMoment = expressionExecuteMomentList.get(i);
+            Log.d(TAG, "executeMoment: " + executeMoment);
+        }
+        Log.d(TAG, "------------打印 expressionExecuteMomentList ---打印完成 ----: ");
+
+    }
+
+
 
     /**
      * 显示动作下发时间点
@@ -821,11 +899,7 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
         Log.d(TAG, "operationTime: "+operationTime);
 
         //时间转换成秒 ，动作需要的时间
-        int seconds=operationTime/1000;
-        int remainder=operationTime%1000;
-        if (remainder>0){
-            seconds++;
-        }
+        int seconds=customUtils.convertedIntoSeconds(operationTime);
         Log.d(TAG, "seconds: "+seconds);
 
         return seconds;
@@ -845,11 +919,7 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
         Log.d(TAG, "operationTime: "+operationTime);
 
         //时间转换成秒 ，表情需要的时间
-        int seconds=operationTime/1000;
-        int remainder=operationTime%1000;
-        if (remainder>0){
-            seconds++;
-        }
+        int seconds=customUtils.convertedIntoSeconds(operationTime);
         Log.d(TAG, "seconds: "+seconds);
 
         return seconds;
@@ -886,6 +956,9 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
     }
 
 
+    /**
+     * 增加动作组 （动作和动作下发时间点）
+     */
     private void addActionData() {
         Log.d(TAG, "addActionData: ");
         int actionPosition = actionSpinner.getSelectedItemPosition();
@@ -935,6 +1008,9 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
 
     }
 
+    /**
+     * 增加表情组 （表情和表情下发时间点）
+     */
     private void addExpressionData(){
         Log.d(TAG, "addExpressionData: ");
         int expressionPosition = expressionSpinner.getSelectedItemPosition();
@@ -982,6 +1058,48 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
 
     }
 
+    /**
+     *  对动作组 进行排序，按动作下发时间点 升序
+     */
+    private void sortShowActionList(){
+        Log.d(TAG, "sortShowActionList: ");
+        Collections.sort(showActionList, new Comparator<ActionInfo>() {
+            @Override
+            public int compare(ActionInfo o1, ActionInfo o2) {
+                int compareResult = -1;
+                if (o1.getToBeOperationTime() > o2.getToBeOperationTime()) {
+                    compareResult = 1;
+                } else if (o1.getToBeOperationTime() == o2.getToBeOperationTime()) {
+                    compareResult = 0;
+                }
+                return compareResult;
+            }
+        });
+        refreshShowExpressionData();
+    }
+
+    /**
+     *  对表情组 进行排序，按表情下发时间点 升序
+     */
+    private void sortExpressionList(){
+        Log.d(TAG, "sortExpressionList: ");
+        Collections.sort(showExpressionList, new Comparator<ExpressionInfo>() {
+            @Override
+            public int compare(ExpressionInfo o1, ExpressionInfo o2) {
+                int compareResult = -1;
+                if (o1.getToBeOperationTime() > o2.getToBeOperationTime()) {
+                    compareResult = 1;
+                } else if (o1.getToBeOperationTime() == o2.getToBeOperationTime()) {
+                    compareResult = 0;
+                }
+                return compareResult;
+            }
+        });
+        refreshShowExpressionData();
+
+    }
+
+
     private Runnable executeMomentDelayRun = new Runnable() {
 
         @Override
@@ -1022,13 +1140,65 @@ public class CustomDialogFragment extends Fragment implements CustomBehavior {
     @Override
     public Map<String, String> getData() {
         Log.d(TAG, "getData: ");
-        return null;
+
+        if (questionString==null
+                || questionString.trim().isEmpty()
+                || answerString==null
+                ||answerString.trim().isEmpty()){
+
+            Toast.makeText(mContext,"请先输入问题和回答内容！",Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        Map<String,String> dataMap=new HashMap<>();
+        //类别
+        dataMap.put(Constants.FRAGMENT_CATEGORY,Constants.FRAGMENT_CATEGORY_CUSTOM_DIALOG);
+        //问题
+        dataMap.put(Constants.QUESTION,questionString);
+        //回答
+        dataMap.put(Constants.ANSWER,answerString);
+        //动作序列 eg:83:3400#,#66:3000#,#67:3000
+        StringBuffer actionCode=new StringBuffer();
+        for (int i=0;i<showActionList.size();i++){
+            ActionInfo actionInfo=showActionList.get(i);
+            int toBeOperationTime=actionInfo.getToBeOperationTime();
+            toBeOperationTime=customUtils.convertedIntoMilliSeconds(toBeOperationTime);
+            String actionSequences=actionInfo.getId()+":"+toBeOperationTime;
+
+            actionCode.append(actionSequences);
+            actionCode.append(Constants.SEPARATOR_BETWEEN_ACTION_AND_ACTION);
+        }
+        if (!actionCode.toString().isEmpty()){
+            dataMap.put(Constants.ACTION_CODE,actionCode.toString());
+        }
+
+        //表情序列
+        StringBuffer expressionCode=new StringBuffer();
+        for (int i=0;i<showExpressionList.size();i++){
+            ExpressionInfo expressionInfo=showExpressionList.get(i);
+            int toBeOperationTime=expressionInfo.getToBeOperationTime();
+            toBeOperationTime=customUtils.convertedIntoMilliSeconds(toBeOperationTime);
+            String expressionSequences=expressionInfo.getId()+":"+toBeOperationTime;
+
+            expressionCode.append(expressionSequences);
+            expressionCode.append(Constants.SEPARATOR_BETWEEN_EXPRESSION_AND_EXPRESSION);
+        }
+        if (!expressionCode.toString().isEmpty()){
+            dataMap.put(Constants.EXPRESSION_CODE,expressionCode.toString());
+        }
+
+        return dataMap;
     }
 
     @Override
     public void init() {
         Log.d(TAG, "init: ");
 
+    }
+
+    @Override
+    public String getBehaviorCategory() {
+        return Constants.FRAGMENT_CATEGORY_CUSTOM_DIALOG;
     }
 
     class QuestionTextWatch implements TextWatcher{

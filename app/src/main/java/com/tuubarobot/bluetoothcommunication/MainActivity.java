@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "准备发送数据: ");
 
                         if (actionCode.length()>0){
-                            wirteData+=answer+Constants.SEPARATOR_BETWEEN_SPEECH_AND_ACTION+actionCode;
+                            wirteData+=answer+Constants.SEPARATOR_BODY_TEXT_APART+actionCode;
                         }else {
                             wirteData+=answer;
                         }

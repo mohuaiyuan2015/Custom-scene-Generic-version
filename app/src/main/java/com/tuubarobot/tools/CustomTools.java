@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.tuubarobot.bluetoothcommunication.Constants;
 import com.tuubarobot.fragment.ActionInfo;
+import com.tuubarobot.fragment.DanceActionInfo;
 import com.tuubarobot.fragment.ExpressionInfo;
 
 import java.io.BufferedReader;
@@ -26,6 +27,8 @@ public class CustomTools {
     private static final String TAG = "CustomTools";
 
 
+    private volatile List<Map<String ,String>> customDanceActionList;
+    private volatile List<Map<String ,String>> customBasicActionList;
     private volatile List<Map<String ,String>> customActionList;
     private volatile List<Map<String ,String>> customExpressionList;
 
@@ -33,6 +36,23 @@ public class CustomTools {
 
     }
 
+    public synchronized List<Map<String,String>> initCustomDanceActionConfig()throws Exception{
+        Log.d(TAG, "initDanceActionConfig: ");
+        String configFileName=Constants.CUSTOM_SCENE_DIR+File.separator+Constants.DANCE_ACTION_FILE_NAME;
+        File file=getSDcardFile(configFileName);
+        Log.d(TAG, "file.getAbsolutePath(): "+file.getAbsolutePath());
+
+        return initCustomActionConfig(file);
+    }
+
+    public synchronized List<Map<String,String>> initCustomBasicActionConfig()throws Exception{
+        Log.d(TAG, "initCustomBasicActionConfig: ");
+        String configFileName=Constants.CUSTOM_SCENE_DIR+File.separator+Constants.BASIC_ACTION_INFO_FILE_NAME;
+        File file=getSDcardFile(configFileName);
+        Log.d(TAG, "file.getAbsolutePath(): "+file.getAbsolutePath());
+
+        return initCustomActionConfig(file);
+    }
 
     public synchronized List<Map<String ,String >> initCustomActionConfig() throws Exception{
         Log.d(TAG, "initCustomActionConfig: ");
@@ -107,6 +127,61 @@ public class CustomTools {
         }
 
         return actionList;
+
+    }
+
+    public synchronized List<DanceActionInfo>initDanceActionConfig()throws Exception {
+        Log.d(TAG, "initDanceActionConfig: ");
+        List<DanceActionInfo> danceActionInfos = new ArrayList<>();
+        customDanceActionList=initCustomDanceActionConfig();
+
+        if (customDanceActionList != null && !customDanceActionList.isEmpty()) {
+            Log.d(TAG, "customDanceActionList.size(): " + customDanceActionList.size());
+            for (int i = 0; i < customDanceActionList.size(); i++) {
+                Map<String, String> map = customDanceActionList.get(i);
+                int id=Integer.valueOf(map.get(DanceActionInfo.DANCE_ACTION_INFO_ID));
+                String name=map.get(DanceActionInfo.DANCE_ACTION_INFO_NAME);
+                int operationTime=Integer.valueOf(map.get(DanceActionInfo.DANCE_ACTION_INFO_OPERATION_TIME));
+
+                DanceActionInfo danceActionInfo=new DanceActionInfo();
+                danceActionInfo.setId(id);
+                danceActionInfo.setName(name);
+                danceActionInfo.setOperationTime(operationTime);
+
+                danceActionInfos.add(danceActionInfo);
+            }
+            return danceActionInfos;
+        } else {
+            Log.e(TAG, "customActionList == null || customActionList.isEmpty() ");
+        }
+        return null;
+    }
+
+    public synchronized List<ActionInfo>initBasicActionConfig()throws Exception{
+        Log.d(TAG, "initBasicActionConfig: ");
+        List<ActionInfo> actionInfos = new ArrayList<>();
+        customBasicActionList=initCustomBasicActionConfig();
+
+        if (customBasicActionList != null && !customBasicActionList.isEmpty()) {
+            Log.d(TAG, "customBasicActionList.size(): " + customBasicActionList.size());
+            for (int i = 0; i < customBasicActionList.size(); i++) {
+                Map<String, String> map = customBasicActionList.get(i);
+                int id=Integer.valueOf(map.get(ActionInfo.ACTION_INFO_ID));
+                String name=map.get(ActionInfo.ACTION_INFO_NAME);
+                int operationTime=Integer.valueOf(map.get(ActionInfo.ACTION_INFO_OPERATION_TIME));
+
+                ActionInfo actionInfo=new ActionInfo();
+                actionInfo.setId(id);
+                actionInfo.setName(name);
+                actionInfo.setOperationTime(operationTime);
+
+                actionInfos.add(actionInfo);
+            }
+            return actionInfos;
+        } else {
+            Log.e(TAG, "customActionList == null || customActionList.isEmpty() ");
+        }
+        return null;
 
     }
 

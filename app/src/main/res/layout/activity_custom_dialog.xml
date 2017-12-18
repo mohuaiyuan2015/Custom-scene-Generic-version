@@ -18,7 +18,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/customDialogCategory"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:padding="10dip"
+            android:textSize="18sp"
+            />
 
         <Spinner
             android:id="@+id/dialogCategory"

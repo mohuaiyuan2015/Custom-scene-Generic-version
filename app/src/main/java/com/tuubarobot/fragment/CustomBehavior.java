@@ -9,4 +9,5 @@ import java.util.Map;
 public interface CustomBehavior {
     Map<String ,String > getData();
     void init();
+    String getBehaviorCategory();
 }

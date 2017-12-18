@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dip"
-    android:background="#F34F0F"
     >
     <TextView
         android:id="@+id/danceTitle"
@@ -11,6 +10,9 @@
         android:layout_height="wrap_content"
         android:text="@string/dance_spinner_title"
         android:layout_marginBottom="10dip"
+        android:background="#D2D2D2"
+        android:padding="10dip"
+        android:textSize="18sp"
         />
 
     <Spinner
@@ -18,7 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/danceTitle"
-
         >
 
     </Spinner>

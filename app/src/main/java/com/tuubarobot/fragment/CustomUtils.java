@@ -62,7 +62,7 @@ public class CustomUtils {
     }
 
     /**
-     * 毫秒转换成秒
+     *  毫秒转换成秒,采用进一法处理余数（尾数）部分
      * @param millisecond
      * @return
      */
@@ -81,7 +81,7 @@ public class CustomUtils {
     }
 
     /**
-     *
+     *  毫秒转换成秒，采用进一法处理余数（尾数）部分
      * @param millisecond
      * @return
      */
@@ -99,5 +99,29 @@ public class CustomUtils {
         return seconds;
 
     }
+
+    /**
+     *  秒转换成毫秒
+     * @param second
+     * @return
+     */
+    public long convertedIntoMilliSeconds(long second){
+        long milliSeconds=0;
+        milliSeconds=second*1000;
+        return milliSeconds;
+    }
+
+    /**
+     *  秒转换成毫秒
+     * @param second
+     * @return
+     */
+    public int convertedIntoMilliSeconds(int second){
+        int milliSeconds=0;
+        milliSeconds=second*1000;
+        return milliSeconds;
+    }
+
+
 
 }

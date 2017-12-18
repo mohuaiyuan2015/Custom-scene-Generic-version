@@ -1,5 +1,6 @@
 package com.tuubarobot.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 
 
 import com.tuubarobot.bluetoothcommunication.R;
+import com.tuubarobot.fragment.CustomUtils;
 import com.tuubarobot.fragment.ExpressionInfo;
 
 import java.util.List;
@@ -20,8 +22,13 @@ public class CustomDialogExpressionAdapter extends BaseAdapter {
 
     private List<ExpressionInfo> expressionInfos;
 
-    public CustomDialogExpressionAdapter(List<ExpressionInfo> expressionInfos){
+    private Context context;
+    private CustomUtils customUtils;
+
+    public CustomDialogExpressionAdapter(Context context,List<ExpressionInfo> expressionInfos){
         this.expressionInfos=expressionInfos;
+        this.context=context;
+        customUtils=new CustomUtils(context);
 
     }
 
@@ -55,7 +62,8 @@ public class CustomDialogExpressionAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) view.getTag();
 
         }
-        viewHolder.expressionDescription.setText(expressionInfo.getName());
+        int operationTimeSeconds=customUtils.convertedIntoSeconds(expressionInfo.getOperationTime());
+        viewHolder.expressionDescription.setText(expressionInfo.getName()+"--"+operationTimeSeconds);
 
         return view;
     }
